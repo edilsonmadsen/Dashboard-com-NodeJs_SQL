@@ -1,0 +1,73 @@
+<!-- Styles -->
+<style>
+  #chartdiv {
+    width: 100%;
+    height: 500px;
+    margin-top: 80px;
+  }
+  </style>
+  
+  <!-- Resources -->
+  <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+  
+  <!-- Chart code -->
+  <script>
+  am5.ready(function() {
+  
+  var root = am5.Root.new("chartdiv");
+  
+  root.setThemes([
+    am5themes_Animated.new(root)
+  ]);
+  
+  var chart = root.container.children.push(
+    am5percent.PieChart.new(root, {
+      endAngle: 270
+    })
+  );
+  
+  var series = chart.series.push(
+    am5percent.PieSeries.new(root, {
+      valueField: "value",
+      categoryField: "category",
+      endAngle: 270
+    })
+  );
+  
+  series.states.create("hidden", {
+    endAngle: -90
+  });
+  
+  const data2 = fetch("http://localhost:3000/users").then(r => r.json()).then(r =>{
+    console.log(r.users)
+    const newUsers = group(r.users)
+    console.log(newUsers)
+    
+    series.data.setAll([{category:"DIGITAL",value:newUsers[0].length},{category:"HUMANO",value:newUsers[1].length}]);
+  })
+
+  function group(users){
+    var novoArray = [];
+
+    novoArray.push(filtrarArray(users,"DIGITAL"));
+    novoArray.push(filtrarArray(users,"HUMANO"));
+
+    console.log(novoArray);
+
+    function filtrarArray(array, tipo) {
+      return array.filter(function(val) {
+        return val.tipo === tipo;  
+      });
+    }
+    return novoArray
+  }
+  
+  series.appear(1000, 100);
+  
+  }); 
+  </script>
+  
+  <!-- HTML -->
+  <div id="chartdiv"></div>
